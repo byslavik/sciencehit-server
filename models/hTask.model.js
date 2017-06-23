@@ -17,7 +17,8 @@ var nTaskSchema = new Schema({
     "presentation": String,
     "tags": Array,
     "next": String,
-    "lang": String
+    "lang": String,
+    "noDisplay": Boolean
 });
 
 var Htask = mongoose.model('Htask', nTaskSchema);
