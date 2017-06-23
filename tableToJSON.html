@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+    <div id="links-content-storage">
+        <table class="confluenceTable tablesorter tablesorter-default stickyTableHeaders" style="padding: 0px;"><thead class="tableFloatingHeaderOriginal"><tr class="tablesorter-headerRow"><th class="confluenceTh sortableHeader" data-column="0" tabindex="0" unselectable="on" style="user-select: none;"><div class="tablesorter-header-inner">selector</div></th><th colspan="1" class="confluenceTh sortableHeader" data-column="1" tabindex="0" unselectable="on" style="user-select: none;"><div class="tablesorter-header-inner">text</div></th><th class="confluenceTh sortableHeader" data-column="2" tabindex="0" unselectable="on" style="user-select: none;"><div class="tablesorter-header-inner">address</div></th></tr></thead><thead class="tableFloatingHeader" style="display: none;"><tr class="tablesorter-headerRow"><th class="confluenceTh sortableHeader" data-column="0" tabindex="0" unselectable="on" style="user-select: none;"><div class="tablesorter-header-inner">Destination</div></th><th colspan="1" class="confluenceTh sortableHeader" data-column="1" tabindex="0" unselectable="on" style="user-select: none;"><div class="tablesorter-header-inner">text</div></th><th class="confluenceTh sortableHeader" data-column="2" tabindex="0" unselectable="on" style="user-select: none;"><div class="tablesorter-header-inner">address</div></th></tr></thead><tbody><tr><td class="confluenceTd">&nbsp;firstLink|first link on the page</td><td colspan="1" class="confluenceTd">&nbsp;The text for this link</td><td class="confluenceTd">http://google.com</td></tr><tr><td class="confluenceTd">&nbsp;<span>secondLink|second link on the page</span></td><td colspan="1" class="confluenceTd">&nbsp;<span>&nbsp;The text for this link [2]</span></td><td class="confluenceTd">http://yandex.com</td></tr></tbody></table>    
+    </div>
+
+
+
+<div id="destination">
+bla bla bla {{firstLink.address}}  a {{firstLink.text}} bla bla bla 
+also bla bla bla {{secondLink.address}}  a {{secondLink.text}}  bla
+ </div>
+
+
+<script type="text/javascript">
+
+function tableToJson (table){
+    let rows = table.getElementsByTagName('tr');
+    let fields = [];
+    let storage = {};
+    
+    for(item of rows){
+        let th = item.querySelectorAll('.tableFloatingHeaderOriginal th');
+        let td = item.getElementsByTagName('td');
+
+        if(th.length != 0) {
+            for(element of th) {
+                fields.push(element.innerText.trim());
+            }
+        }
+        if(td.length != 0) {
+            let i = 0;
+            let objectName = td[0].innerText.split("|")[0].trim();
+                storage[objectName] = {};
+
+            for(element of td) {
+                storage[objectName][fields[i]] = element.innerText.trim();
+                i++;
+            }
+                  
+        }
+    }
+
+    return storage;
+}
+
+
+function renderPage (destination, storage) {
+    let renderedPage = destination.innerHTML.replace( /{{(\w+\.\w+)}}/ig , function(found, value) {
+            let splittedValue = value.split('.');
+            let objName = splittedValue[0];
+            let objProperty = splittedValue[1];
+            let storageValue = storage[objName][objProperty];
+            console.log(value);
+            return storageValue === undefined ? found : storageValue ;
+        })
+
+    destination.innerHTML = renderedPage;
+}
+
+let linksTable = document.getElementById('links-content-storage');
+let linksStorage = tableToJson(linksTable);
+let linksDestination = document.getElementById('destination');
+
+renderPage(linksDestination, linksStorage);
+
+
+</script>
+    </body>
+</html>
